@@ -14,7 +14,8 @@ export default defineConfig({
     server : {
         open  : true, // 自动打开浏览器
         proxy : {
-            '/cwl_admin' : 'https://www.cwl.gov.cn'
+            '/cwl_admin' : 'https://www.cwl.gov.cn',
+            '/gateway'   : 'https://webapi.sporttery.cn'
         }
     }
 });
