@@ -1,21 +1,24 @@
-import { fileURLToPath, URL } from 'node:url';
+import { fileURLToPath, URL } from 'node:url'
 
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+import vueDevTools from 'vite-plugin-vue-devtools'
 
-// https://vitejs.dev/config/
+// https://vite.dev/config/
 export default defineConfig({
-    plugins : [vue()],
-    resolve : {
-        alias : {
-            '@' : fileURLToPath(new URL('./src', import.meta.url))
-        }
+  plugins: [vue(), vueJsx(), vueDevTools()],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
-    server : {
-        open  : true, // 自动打开浏览器
-        proxy : {
-            '/cwl_admin' : 'https://www.cwl.gov.cn',
-            '/gateway'   : 'https://webapi.sporttery.cn'
-        }
-    }
-});
+  },
+  server: {
+    open: true, // 自动打开浏览器
+    proxy: {
+      '/api/dafabet': 'http://local.com',
+      '/cwl_admin': 'https://www.cwl.gov.cn',
+      '/gateway': 'https://webapi.sporttery.cn',
+    },
+  },
+})

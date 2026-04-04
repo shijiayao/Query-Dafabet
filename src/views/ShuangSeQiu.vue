@@ -21,7 +21,7 @@ const prizegradesArray = ref([
   { type: 4, ruleArray: ['5 + 0', '4 + 1'] },
   { type: 5, ruleArray: ['4 + 0', '3 + 1'] },
   { type: 6, ruleArray: ['2 + 1', '1 + 1', '0 + 1'] },
-  { type: 7, ruleArray: [] }
+  { type: 7, ruleArray: [] },
 ])
 
 function initValue() {
@@ -38,14 +38,11 @@ watch(
       initValue()
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 function tableRowClassName_Phase(rowObject) {
-  return Number(rowObject.row.code) >= Number(phase.value) &&
-    Number(rowObject.row.code) < Number(phase.value) + Number(serial.value)
-    ? 'target-row'
-    : ''
+  return Number(rowObject.row.code) >= Number(phase.value) && Number(rowObject.row.code) < Number(phase.value) + Number(serial.value) ? 'target-row' : ''
 }
 
 function isHitOrMiss(ball, row) {
@@ -55,22 +52,13 @@ function isHitOrMiss(ball, row) {
 function computePrizegradesObject(row) {
   const redBallTargetArray = row.red.split(',')
   const blueBallTargetArray = row.blue.split(',')
-  const redBallCrossArray = [
-    ...new Set(redBallTargetArray.filter((it) => redBallArray.value.includes(it)))
-  ]
-  const blueBallCrossArray = [
-    ...new Set(blueBallTargetArray.filter((it) => blueBallArray.value.includes(it)))
-  ]
+  const redBallCrossArray = [...new Set(redBallTargetArray.filter((it) => redBallArray.value.includes(it)))]
+  const blueBallCrossArray = [...new Set(blueBallTargetArray.filter((it) => blueBallArray.value.includes(it)))]
 
   const digitalCombination = `${redBallCrossArray.length} + ${blueBallCrossArray.length}`
-  let prizegradesIndex = prizegradesArray.value.findIndex((element) =>
-    element.ruleArray.includes(digitalCombination)
-  )
+  let prizegradesIndex = prizegradesArray.value.findIndex((element) => element.ruleArray.includes(digitalCombination))
 
-  prizegradesIndex =
-    prizegradesIndex > -1 && prizegradesIndex < prizegradesArray.value.length
-      ? prizegradesIndex
-      : prizegradesArray.value.length - 1
+  prizegradesIndex = prizegradesIndex > -1 && prizegradesIndex < prizegradesArray.value.length ? prizegradesIndex : prizegradesArray.value.length - 1
 
   const type = prizegradesArray.value[prizegradesIndex].type
 
@@ -78,7 +66,7 @@ function computePrizegradesObject(row) {
     type,
     prizegradesIndex,
     digitalCombination,
-    chineseLevel: `${toChineseNumber(type)}等奖`
+    chineseLevel: `${toChineseNumber(type)}等奖`,
   }
 }
 
@@ -95,7 +83,7 @@ function computeMoney(row) {
 
   return {
     preTaxMoney: preTaxMoney.toFixed(0) * multiplying.value,
-    afterTaxMoney: afterTaxMoney.toFixed(0) * multiplying.value
+    afterTaxMoney: afterTaxMoney.toFixed(0) * multiplying.value,
   }
 }
 </script>
@@ -105,21 +93,9 @@ function computeMoney(row) {
     <el-tag>[ 每周二、四、日21:15开奖 ]</el-tag>
 
     <section class="input-container">
-      <el-input
-        class="red-ball-input"
-        v-model="redBallArray[index]"
-        style="width: 40px"
-        v-for="(item, index) in redBallArray"
-        :key="index"
-      />
+      <el-input class="red-ball-input" v-model="redBallArray[index]" style="width: 40px" v-for="(item, index) in redBallArray" :key="index" />
       <el-tag type="info" size="large">+</el-tag>
-      <el-input
-        class="blue-ball-input"
-        v-model="blueBallArray[index]"
-        style="width: 40px"
-        v-for="(item, index) in blueBallArray"
-        :key="index"
-      />
+      <el-input class="blue-ball-input" v-model="blueBallArray[index]" style="width: 40px" v-for="(item, index) in blueBallArray" :key="index" />
       <section class="param-group">
         <el-input v-model="multiplying" style="width: 130px">
           <template #prepend>倍数</template>
@@ -139,65 +115,23 @@ function computeMoney(row) {
     </section>
   </section>
 
-  <el-table
-    :data="kjxx"
-    stripe
-    border
-    style="width: 100%"
-    class="ssq-el-table"
-    :row-class-name="tableRowClassName_Phase"
-  >
-    <el-table-column
-      type="index"
-      align="center"
-      width="50"
-      class-name="column-phase"
-    ></el-table-column>
-    <el-table-column
-      prop="code"
-      label="期号"
-      align="center"
-      width="100"
-      class-name="column-phase"
-    ></el-table-column>
-    <el-table-column
-      prop="date"
-      label="开奖日期"
-      align="center"
-      width="140"
-      class-name="column-phase"
-    ></el-table-column>
+  <el-table :data="kjxx" stripe border style="width: 100%" class="ssq-el-table" :row-class-name="tableRowClassName_Phase">
+    <el-table-column type="index" align="center" width="50" class-name="column-phase"></el-table-column>
+    <el-table-column prop="code" label="期号" align="center" width="100" class-name="column-phase"></el-table-column>
+    <el-table-column prop="date" label="开奖日期" align="center" width="140" class-name="column-phase"></el-table-column>
     <el-table-column prop="red" label="开奖号码" align="center" width="240">
       <template #default="scope">
         <ul class="ball-gurp">
-          <li class="ball-item ball-red" v-for="item in scope.row.red.split(',')" :key="item">
-            {{ item }}
-          </li>
-          <li class="ball-item ball-blue" v-for="item in scope.row.blue.split(',')" :key="item">
-            {{ item }}
-          </li>
+          <li class="ball-item ball-red" v-for="item in scope.row.red.split(',')" :key="item">{{ item }}</li>
+          <li class="ball-item ball-blue" v-for="item in scope.row.blue.split(',')" :key="item">{{ item }}</li>
         </ul>
       </template>
     </el-table-column>
     <el-table-column prop="red" label="中奖号码" align="center" width="240">
       <template #default="scope">
         <ul class="ball-gurp">
-          <li
-            class="ball-item"
-            :class="'ball-red' + isHitOrMiss(item, scope.row.red.split(','))"
-            v-for="item in redBallArray"
-            :key="item"
-          >
-            {{ item }}
-          </li>
-          <li
-            class="ball-item"
-            :class="'ball-blue' + isHitOrMiss(item, scope.row.blue.split(','))"
-            v-for="item in blueBallArray"
-            :key="item"
-          >
-            {{ item }}
-          </li>
+          <li class="ball-item" :class="'ball-red' + isHitOrMiss(item, scope.row.red.split(','))" v-for="item in redBallArray" :key="item">{{ item }}</li>
+          <li class="ball-item" :class="'ball-blue' + isHitOrMiss(item, scope.row.blue.split(','))" v-for="item in blueBallArray" :key="item">{{ item }}</li>
         </ul>
       </template>
     </el-table-column>
