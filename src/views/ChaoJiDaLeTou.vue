@@ -46,8 +46,7 @@ watch(
 )
 
 function tableRowClassName_Phase(rowObject) {
-  return Number(rowObject.row.lotteryDrawNum) >= Number(phase.value) &&
-    Number(rowObject.row.lotteryDrawNum) < Number(phase.value) + Number(serial.value)
+  return Number(rowObject.row.lotteryDrawNum) >= Number(phase.value) && Number(rowObject.row.lotteryDrawNum) < Number(phase.value) + Number(serial.value)
     ? 'target-row'
     : ''
 }
@@ -59,22 +58,13 @@ function isHitOrMiss(ball, row) {
 function computePrizegradesObject(row) {
   const redBallTargetArray = row.lotteryDrawResult.split(' ').slice(0, 5)
   const blueBallTargetArray = row.lotteryDrawResult.split(' ').slice(5)
-  const redBallCrossArray = [
-    ...new Set(redBallTargetArray.filter((it) => redBallArray.value.includes(it)))
-  ]
-  const blueBallCrossArray = [
-    ...new Set(blueBallTargetArray.filter((it) => blueBallArray.value.includes(it)))
-  ]
+  const redBallCrossArray = [...new Set(redBallTargetArray.filter((it) => redBallArray.value.includes(it)))]
+  const blueBallCrossArray = [...new Set(blueBallTargetArray.filter((it) => blueBallArray.value.includes(it)))]
 
   const digitalCombination = `${redBallCrossArray.length} + ${blueBallCrossArray.length}`
-  let prizegradesIndex = prizegradesArray.value.findIndex((element) =>
-    element.ruleArray.includes(digitalCombination)
-  )
+  let prizegradesIndex = prizegradesArray.value.findIndex((element) => element.ruleArray.includes(digitalCombination))
 
-  prizegradesIndex =
-    prizegradesIndex > -1 && prizegradesIndex < prizegradesArray.value.length
-      ? prizegradesIndex
-      : prizegradesArray.value.length - 1
+  prizegradesIndex = prizegradesIndex > -1 && prizegradesIndex < prizegradesArray.value.length ? prizegradesIndex : prizegradesArray.value.length - 1
 
   const type = prizegradesArray.value[prizegradesIndex].type
   const group = prizegradesArray.value[prizegradesIndex].group
@@ -97,10 +87,7 @@ function computePrizegrades(row) {
 function computeMoney(row) {
   const resultObject = computePrizegradesObject(row)
 
-  let preTaxMoney = Number(
-    row.prizeLevelList.filter((element) => Number(element.group) === Number(resultObject.group))[0]
-      ?.stakeAmountFormat ?? 0
-  )
+  let preTaxMoney = Number(row.prizeLevelList.filter((element) => Number(element.group) === Number(resultObject.group))[0]?.stakeAmountFormat ?? 0)
 
   if (appendValue.value && (resultObject.type === 1 || resultObject.type === 2)) {
     preTaxMoney += parseInt(preTaxMoney * 0.8)
@@ -120,21 +107,9 @@ function computeMoney(row) {
     <el-tag>[ 每周 一、三、六 开奖 ]</el-tag>
 
     <section class="input-container">
-      <el-input
-        class="red-ball-input"
-        v-model="redBallArray[index]"
-        style="width: 40px"
-        v-for="(item, index) in redBallArray"
-        :key="index"
-      />
+      <el-input class="red-ball-input" v-model="redBallArray[index]" style="width: 40px" v-for="(item, index) in redBallArray" :key="index" />
       <el-tag type="info" size="large">+</el-tag>
-      <el-input
-        class="blue-ball-input"
-        v-model="blueBallArray[index]"
-        style="width: 40px"
-        v-for="(item, index) in blueBallArray"
-        :key="index"
-      />
+      <el-input class="blue-ball-input" v-model="blueBallArray[index]" style="width: 40px" v-for="(item, index) in blueBallArray" :key="index" />
       <section class="param-group">
         <el-input v-model="multiplying" style="width: 130px">
           <template #prepend>倍数</template>
@@ -152,53 +127,19 @@ function computeMoney(row) {
         </el-input>
       </section>
       <section class="param-group">
-        <el-switch
-          v-model="appendValue"
-          class="ml-2"
-          inline-prompt
-          active-text="追加"
-          inactive-text="追加"
-        />
+        <el-switch v-model="appendValue" class="ml-2" inline-prompt active-text="追加" inactive-text="追加" />
       </section>
     </section>
   </section>
 
-  <el-table
-    :data="kjxx"
-    stripe
-    border
-    style="width: 100%"
-    class="cjdlt-el-table"
-    :row-class-name="tableRowClassName_Phase"
-  >
-    <el-table-column
-      type="index"
-      align="center"
-      width="50"
-      class-name="column-phase"
-    ></el-table-column>
-    <el-table-column
-      prop="lotteryDrawNum"
-      label="期号"
-      align="center"
-      width="100"
-      class-name="column-phase"
-    ></el-table-column>
-    <el-table-column
-      prop="lotteryDrawTime"
-      label="开奖日期"
-      align="center"
-      width="140"
-      class-name="column-phase"
-    ></el-table-column>
+  <el-table :data="kjxx" stripe border style="width: 100%" class="cjdlt-el-table" :row-class-name="tableRowClassName_Phase">
+    <el-table-column type="index" align="center" width="50" class-name="column-phase"></el-table-column>
+    <el-table-column prop="lotteryDrawNum" label="期号" align="center" width="100" class-name="column-phase"></el-table-column>
+    <el-table-column prop="lotteryDrawTime" label="开奖日期" align="center" width="140" class-name="column-phase"></el-table-column>
     <el-table-column prop="red" label="开奖号码" align="center" width="240">
       <template #default="scope">
         <ul class="ball-gurp">
-          <li
-            :class="index < 5 ? 'ball-item ball-red' : 'ball-item ball-blue'"
-            v-for="(item, index) in scope.row.lotteryDrawResult.split(' ')"
-            :key="item"
-          >
+          <li :class="index < 5 ? 'ball-item ball-red' : 'ball-item ball-blue'" v-for="(item, index) in scope.row.lotteryDrawResult.split(' ')" :key="item">
             {{ item }}
           </li>
         </ul>
@@ -209,9 +150,7 @@ function computeMoney(row) {
         <ul class="ball-gurp">
           <li
             class="ball-item"
-            :class="
-              'ball-red' + isHitOrMiss(item, scope.row.lotteryDrawResult.split(' ').slice(0, 5))
-            "
+            :class="'ball-red' + isHitOrMiss(item, scope.row.lotteryDrawResult.split(' ').slice(0, 5))"
             v-for="item in redBallArray"
             :key="item"
           >
@@ -219,9 +158,7 @@ function computeMoney(row) {
           </li>
           <li
             class="ball-item"
-            :class="
-              'ball-blue' + isHitOrMiss(item, scope.row.lotteryDrawResult.split(' ').slice(5))
-            "
+            :class="'ball-blue' + isHitOrMiss(item, scope.row.lotteryDrawResult.split(' ').slice(5))"
             v-for="item in blueBallArray"
             :key="item"
           >

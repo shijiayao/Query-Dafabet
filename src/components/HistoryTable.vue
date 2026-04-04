@@ -113,6 +113,8 @@ function confirmEditGroupBall() {
     })
     return
   }
+
+  props.HistoryObject.editGroupBall(groupBallInfo.value)
 }
 </script>
 
@@ -179,7 +181,7 @@ function confirmEditGroupBall() {
       </template>
     </el-table-column>
     <el-table-column prop="倍数" label="倍数" align="center" width="100"></el-table-column>
-    <el-table-column align="center" prop="金额" label="金额"></el-table-column>
+    <el-table-column align="center" prop="中奖金额" label="中奖金额"></el-table-column>
     <el-table-column align="center" label="操作" width="160">
       <template #default="scope">
         <el-button type="primary" size="small" v-on:click="editGroupBall(scope.row)">编辑</el-button>
@@ -206,7 +208,7 @@ function confirmEditGroupBall() {
         :key="index"
       />
       <section class="param-group">
-        <el-input v-model="groupBallInfo.期号" style="width: 150px">
+        <el-input v-model="groupBallInfo.期号" style="width: 150px" disabled>
           <template #prepend>期号</template>
         </el-input>
       </section>

@@ -34,8 +34,6 @@ export const useDafabetStore = defineStore('dafabetDatabase', () => {
       ...params
     }
 
-    console.log(defaultParams)
-
     return fetch('/api/dafabet', {
       method: 'POST',
       headers: {
@@ -69,7 +67,7 @@ export const useDafabetStore = defineStore('dafabetDatabase', () => {
 export const useShuangseqiuStore = defineStore('shuangseqiu', () => {
   const kjxx = ref([])
   function increment() {
-    fetch(
+    return fetch(
       `/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?${canshu({
         name: 'ssq',
         issueCount: '',
@@ -97,7 +95,7 @@ export const useShuangseqiuStore = defineStore('shuangseqiu', () => {
 export const useChaojidaletouStore = defineStore('chaojidaletou', () => {
   const kjxx = ref([])
   function increment() {
-    fetch(
+    return fetch(
       `/gateway/lottery/getHistoryPageListV1.qry?${canshu({
         gameNo: 85,
         provinceId: 0,

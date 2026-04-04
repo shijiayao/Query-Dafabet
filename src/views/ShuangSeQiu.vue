@@ -21,7 +21,7 @@ const prizegradesArray = ref([
   { type: 4, ruleArray: ['5 + 0', '4 + 1'] },
   { type: 5, ruleArray: ['4 + 0', '3 + 1'] },
   { type: 6, ruleArray: ['2 + 1', '1 + 1', '0 + 1'] },
-  { type: 7, ruleArray: [] },
+  { type: 7, ruleArray: [] }
 ])
 
 function initValue() {
@@ -38,7 +38,7 @@ watch(
       initValue()
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
 
 function tableRowClassName_Phase(rowObject) {
@@ -66,7 +66,7 @@ function computePrizegradesObject(row) {
     type,
     prizegradesIndex,
     digitalCombination,
-    chineseLevel: `${toChineseNumber(type)}等奖`,
+    chineseLevel: `${toChineseNumber(type)}等奖`
   }
 }
 
@@ -83,7 +83,7 @@ function computeMoney(row) {
 
   return {
     preTaxMoney: preTaxMoney.toFixed(0) * multiplying.value,
-    afterTaxMoney: afterTaxMoney.toFixed(0) * multiplying.value,
+    afterTaxMoney: afterTaxMoney.toFixed(0) * multiplying.value
   }
 }
 </script>
