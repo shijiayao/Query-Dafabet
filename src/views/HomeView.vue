@@ -15,11 +15,11 @@ const ssqArray = ref([
 const cjdltArray = ref([
   { AwardLevel: 1, bonus: '浮动', ruleArray: ['5 + 2'] },
   { AwardLevel: 2, bonus: '浮动', ruleArray: ['5 + 1'] },
-  { AwardLevel: 3, bonus: '10,000元', ruleArray: ['5 + 0'] },
-  { AwardLevel: 4, bonus: '3,000元', ruleArray: ['4 + 2'] },
-  { AwardLevel: 5, bonus: '300元', ruleArray: ['4 + 1'] },
-  { AwardLevel: 6, bonus: '200元', ruleArray: ['3 + 2'] },
-  { AwardLevel: 7, bonus: '100元', ruleArray: ['4 + 0'] },
+  { AwardLevel: 3, bonus: '浮动', ruleArray: ['5 + 0'] },
+  { AwardLevel: 4, bonus: '浮动', ruleArray: ['4 + 2'] },
+  { AwardLevel: 5, bonus: '5000元', ruleArray: ['4 + 1'] },
+  { AwardLevel: 6, bonus: '300元', ruleArray: ['3 + 2'] },
+  { AwardLevel: 7, bonus: '150元', ruleArray: ['4 + 0'] },
   { AwardLevel: 8, bonus: '15元', ruleArray: ['3 + 1', '2 + 2'] },
   { AwardLevel: 9, bonus: '5元', ruleArray: ['3 + 0', '2 + 1', '1 + 2', '0 + 2'] },
   { AwardLevel: 10, bonus: '0元', ruleArray: [] }

@@ -17,14 +17,14 @@ let appendValue = ref(true) // 追加
 // 奖品等级
 const prizegradesArray = ref([
   { type: 1, group: 101, ruleArray: ['5 + 2'] },
-  { type: 2, group: 301, ruleArray: ['5 + 1'] },
-  { type: 3, group: 501, ruleArray: ['5 + 0'] },
-  { type: 4, group: 601, ruleArray: ['4 + 2'] },
-  { type: 5, group: 701, ruleArray: ['4 + 1'] },
-  { type: 6, group: 801, ruleArray: ['3 + 2'] },
-  { type: 7, group: 901, ruleArray: ['4 + 0'] },
-  { type: 8, group: 1001, ruleArray: ['3 + 1', '2 + 2'] },
-  { type: 9, group: 1101, ruleArray: ['3 + 0', '2 + 1', '1 + 2', '0 + 2'] },
+  { type: 2, group: 201, ruleArray: ['5 + 1'] },
+  { type: 3, group: 301, ruleArray: ['5 + 0'] },
+  { type: 4, group: 401, ruleArray: ['4 + 2'] },
+  { type: 5, group: 501, ruleArray: ['4 + 1'] },
+  { type: 6, group: 601, ruleArray: ['3 + 2'] },
+  { type: 7, group: 701, ruleArray: ['4 + 0'] },
+  { type: 8, group: 801, ruleArray: ['3 + 1', '2 + 2'] },
+  { type: 9, group: 901, ruleArray: ['3 + 0', '2 + 1', '1 + 2', '0 + 2'] },
   { type: 10, group: 0, ruleArray: [] }
 ])
 
