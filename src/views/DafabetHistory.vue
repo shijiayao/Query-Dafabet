@@ -1,27 +1,27 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useDafabetStore, useShuangseqiuStore, useChaojidaletouStore } from '@/stores/counter'
+import { useDafabetStore, useCrawlerDrawStore } from '@/stores/counter'
 import HistoryTable from '@/components/HistoryTable.vue'
 import { ElMessage } from 'element-plus'
 
 const dafabetStore = useDafabetStore()
-const shuangseqiuStore = useShuangseqiuStore()
-const chaojidaletouStore = useChaojidaletouStore()
+const crawlerDrawStore = useCrawlerDrawStore()
 
 const { dafabetDatabase } = storeToRefs(dafabetStore)
-const { kjxx: shuangseqiuKjxx } = storeToRefs(shuangseqiuStore)
-const { kjxx: chaojidaletouKjxx } = storeToRefs(chaojidaletouStore)
+const { crawlerDatabase } = storeToRefs(crawlerDrawStore)
 
 let activeName = ref('shuangseqiu')
 
-// dafabetDatabase, shuangseqiuKjxx, chaojidaletouKjxx api 在 counter.js 中已经初始化请求了，组件加载时直接使用 store 中的数据进行计算和展示
-// 组件加载时只需等待 dafabetDatabase, shuangseqiuKjxx, chaojidaletouKjxx api 请求完成后再进行数据处理，避免数据未准备好时进行计算导致错误
-onMounted(() => {
-  Promise.all([dafabetStore.fetchData({ RequestType: 'query' }), shuangseqiuStore.increment(), chaojidaletouStore.increment()]).then(() => {
-    updateDafabetStore()
-  })
-})
+watch(
+  () => [dafabetStore.dafabetDatabase, crawlerDrawStore.crawlerDatabase],
+  ([dafabetDatabase, crawlerDatabase]) => {
+    if (dafabetDatabase.shuangseqiu.length > 0 && crawlerDatabase.kjxx_shuangseqiu.length > 0) {
+      updateDafabetStore()
+    }
+  },
+  { immediate: true }
+)
 
 const databaseComputed = computed(() => {
   for (const key in dafabetDatabase.value) {
@@ -30,29 +30,6 @@ const databaseComputed = computed(() => {
       console.warn(`数据结构错误: ${key} 不是数组, 获得:`, dafabetDatabase.value[key])
       continue
     }
-
-    dafabetDatabase.value[key].forEach((element) => {
-      const 开奖号码Array = (element.开奖号码 || '')
-        .split(',')
-        .filter((item) => item !== '')
-        .map((num) => num.trim().padStart(2, 0))
-      const 号码Array = (element.号码 || '')
-        .split(',')
-        .filter((item) => item !== '')
-        .map((num) => num.trim().padStart(2, 0))
-
-      if (key === 'shuangseqiu') {
-        element.开奖号码红球 = 开奖号码Array.slice(0, 6)
-        element.开奖号码蓝球 = 开奖号码Array.slice(6)
-        element.号码红球 = 号码Array.slice(0, 6)
-        element.号码蓝球 = 号码Array.slice(6)
-      } else if (key === 'chaojidaletou') {
-        element.开奖号码红球 = 开奖号码Array.slice(0, 5)
-        element.开奖号码蓝球 = 开奖号码Array.slice(5)
-        element.号码红球 = 号码Array.slice(0, 5)
-        element.号码蓝球 = 号码Array.slice(5)
-      }
-    })
   }
 
   return dafabetDatabase.value
@@ -63,7 +40,6 @@ const shuangseqiuHistoryObject = computed(() => {
     activeName: activeName.value,
     tableData: databaseComputed.value.shuangseqiu,
     addGroupBall,
-    editGroupBall,
     deleteGroupBall
   }
 })
@@ -72,7 +48,6 @@ const chaojidaletouHistoryObject = computed(() => {
     activeName: activeName.value,
     tableData: databaseComputed.value.chaojidaletou,
     addGroupBall,
-    editGroupBall,
     deleteGroupBall
   }
 })
@@ -88,14 +63,14 @@ function buildDrawResult(row, key) {
   if (!row) return ''
 
   if (key === 'shuangseqiu') {
-    return normalizeBall(`${row.red || ''},${row.blue || ''}`).join(', ')
+    return normalizeBall(`${row.red || ''},${row.blue || ''}`)
   }
 
   if (key === 'chaojidaletou') {
-    return normalizeBall(row.lotteryDrawResult || '', /\s+/).join(', ')
+    return normalizeBall(row.lotteryDrawResult || '', /\s+/)
   }
 
-  return ''
+  return []
 }
 
 const ssqPrizeRules = [
@@ -120,14 +95,11 @@ const cjdltPrizeRules = [
   { type: 10, group: 0, ruleArray: [] }
 ]
 
-function calcSsqPrize(row, ticketNumbers, multiplier = 1) {
-  if (!row || !ticketNumbers) return null
+function calcSsqPrize(row, ticketReds, ticketBlues, multiplier = 1) {
+  if (!row || ticketReds.length === 0 || ticketBlues.length === 0) return null
 
   const winningReds = normalizeBall(row.red || '')
   const winningBlues = normalizeBall(row.blue || '')
-  const ticketBalls = normalizeBall(ticketNumbers, /[\s,]+/)
-  const ticketReds = ticketBalls.slice(0, 6)
-  const ticketBlues = ticketBalls.slice(6)
 
   if (ticketReds.length < 6 || ticketBlues.length < 1) return 0
 
@@ -142,15 +114,12 @@ function calcSsqPrize(row, ticketNumbers, multiplier = 1) {
   return Number(prizeEntry.typemoney) * multiplier
 }
 
-function calcCjdltPrize(row, ticketNumbers, multiplier = 1, append = false) {
-  if (!row || !ticketNumbers) return null
+function calcCjdltPrize(row, ticketReds, ticketBlues, multiplier = 1, append = false) {
+  if (!row || ticketReds.length === 0 || ticketBlues.length === 0) return null
 
   const drawBalls = normalizeBall(row.lotteryDrawResult || '', /\s+/)
   const winningReds = drawBalls.slice(0, 5)
   const winningBlues = drawBalls.slice(5)
-  const ticketBalls = normalizeBall(ticketNumbers, /[\s,]+/)
-  const ticketReds = ticketBalls.slice(0, 5)
-  const ticketBlues = ticketBalls.slice(5)
 
   if (ticketReds.length < 5 || ticketBlues.length < 2) return 0
 
@@ -174,8 +143,18 @@ function calcCjdltPrize(row, ticketNumbers, multiplier = 1, append = false) {
 
 function updateDafabetStore() {
   const sourceData = {
-    shuangseqiu: shuangseqiuKjxx.value,
-    chaojidaletou: chaojidaletouKjxx.value
+    shuangseqiu: crawlerDatabase.value.kjxx_shuangseqiu.map((elemment) => {
+      return {
+        id: elemment.id,
+        ...elemment.detailed_content
+      }
+    }),
+    chaojidaletou: crawlerDatabase.value.kjxx_chaojidaletou.map((elemment) => {
+      return {
+        id: elemment.id,
+        ...elemment.detailed_content
+      }
+    })
   }
 
   const updateRequests = []
@@ -196,6 +175,7 @@ function updateDafabetStore() {
       const source = lookup.get(phase)
       if (!source) return
 
+      const 号码长度 = key === 'shuangseqiu' ? 6 : 5
       const drawDate = key === 'shuangseqiu' ? source.date : source.lotteryDrawTime
       const drawResult = buildDrawResult(source, key)
       const multiplier = Number(record.倍数) || 1
@@ -204,12 +184,16 @@ function updateDafabetStore() {
       if (drawDate && !record.开奖日期) {
         payload.开奖日期 = drawDate
       }
-      if (drawResult && !record.开奖号码) {
-        payload.开奖号码 = drawResult
+      if (drawResult.length > 0 && record.开奖号码红球.length === 0 && record.开奖号码蓝球.length === 0) {
+        payload.开奖号码红球 = drawResult.slice(0, 号码长度)
+        payload.开奖号码蓝球 = drawResult.slice(号码长度)
       }
 
-      if (record.号码) {
-        const prize = key === 'shuangseqiu' ? calcSsqPrize(source, record.号码, multiplier) : calcCjdltPrize(source, record.号码, multiplier, false)
+      if (record.投注号码红球.length > 0 && record.投注号码蓝球.length > 0) {
+        const prize =
+          key === 'shuangseqiu'
+            ? calcSsqPrize(source, record.投注号码红球, record.投注号码蓝球, multiplier)
+            : calcCjdltPrize(source, record.投注号码红球, record.投注号码蓝球, multiplier, false)
 
         if (prize !== null && prize > 0 && !record.中奖金额) {
           payload.中奖金额 = String(prize)
@@ -222,9 +206,11 @@ function updateDafabetStore() {
 
       updateRequests.push({
         dafafetName: key,
+        id: record.id,
         期号: record.期号,
         开奖日期: payload.开奖日期,
-        开奖号码: payload.开奖号码,
+        开奖号码红球: payload.开奖号码红球,
+        开奖号码蓝球: payload.开奖号码蓝球,
         中奖金额: payload.中奖金额
       })
     })
@@ -234,10 +220,23 @@ function updateDafabetStore() {
     return Promise.resolve()
   }
 
-  return dafabetStore.fetchData({
-    RequestType: 'update',
-    groupBall: updateRequests
-  })
+  return dafabetStore
+    .increment({
+      RequestType: 'update',
+      groupBall: updateRequests
+    })
+    .then(() => {
+      ElMessage({
+        type: 'success',
+        message: '更新开奖信息成功！'
+      })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'error',
+        message: '更新开奖信息失败，请检查！'
+      })
+    })
 }
 
 function addGroupBall(params) {
@@ -245,10 +244,12 @@ function addGroupBall(params) {
 
   for (let index = 0; index < params.serial; index++) {
     addBallArray.push({
+      dafafetName: activeName.value,
       期号: Number(params.phase) + index,
       开奖日期: '',
       开奖号码: '',
-      号码: [].concat(params.redBallArray, params.blueBallArray).join(', '),
+      投注号码红球: params.redBallArray,
+      投注号码蓝球: params.blueBallArray,
       倍数: params.multiplying,
       中奖金额: ''
     })
@@ -257,7 +258,6 @@ function addGroupBall(params) {
   dafabetStore
     .fetchData({
       RequestType: 'add',
-      dafafetName: activeName.value,
       groupBall: addBallArray
     })
     .then(() => {
@@ -278,8 +278,12 @@ function deleteGroupBall(params) {
   dafabetStore
     .fetchData({
       RequestType: 'delete',
-      dafafetName: activeName.value,
-      期号: params.期号
+      groupBall: [
+        {
+          dafafetName: activeName.value,
+          id: params.id
+        }
+      ]
     })
     .then(() => {
       ElMessage({
@@ -291,28 +295,6 @@ function deleteGroupBall(params) {
       ElMessage({
         type: 'error',
         message: '删除失败，请重试！'
-      })
-    })
-}
-
-function editGroupBall(params) {
-  dafabetStore
-    .fetchData({
-      RequestType: 'edit',
-      dafafetName: activeName.value,
-      groupBall: [].concat(params.号码红球, params.号码蓝球).join(', '),
-      phase: params.期号
-    })
-    .then(() => {
-      ElMessage({
-        type: 'success',
-        message: '编辑成功！'
-      })
-    })
-    .catch(() => {
-      ElMessage({
-        type: 'error',
-        message: '编辑失败，请重试！'
       })
     })
 }

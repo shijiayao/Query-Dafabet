@@ -10,15 +10,14 @@ export default defineConfig({
   plugins: [vue(), vueJsx(), vueDevTools()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
   },
   server: {
     open: true, // 自动打开浏览器
     proxy: {
       '/api/dafabet': 'http://local.com',
-      '/cwl_admin': 'https://www.cwl.gov.cn',
-      '/gateway': 'https://webapi.sporttery.cn',
-    },
-  },
+      '/api/crawler/draw': 'http://local.com'
+    }
+  }
 })

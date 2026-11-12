@@ -1,21 +1,40 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { storeToRefs } from 'pinia'
+import { ref, computed, watch } from 'vue'
 import StatisticsProgress from '@/components/StatisticsProgress.vue'
-import { useShuangseqiuStore, useChaojidaletouStore } from '@/stores/counter'
+import { useCrawlerDrawStore } from '@/stores/counter'
 
-const ssqStore = useShuangseqiuStore()
-const cjdltStore = useChaojidaletouStore()
+const crawlerDrawStore = useCrawlerDrawStore()
 
-const { kjxx: ssqKjxx } = storeToRefs(ssqStore)
-const { kjxx: cjdltKjxx } = storeToRefs(cjdltStore)
+let kjxx_shuangseqiu = ref([])
+let kjxx_chaojidaletou = ref([])
+
+watch(
+  () => [crawlerDrawStore.crawlerDatabase],
+  ([crawlerDatabase]) => {
+    if (crawlerDatabase.kjxx_shuangseqiu.length > 0) {
+      kjxx_shuangseqiu.value = crawlerDatabase.kjxx_shuangseqiu.map((elemment) => {
+        return {
+          id: elemment.id,
+          ...elemment.detailed_content
+        }
+      })
+      kjxx_chaojidaletou.value = crawlerDatabase.kjxx_chaojidaletou.map((elemment) => {
+        return {
+          id: elemment.id,
+          ...elemment.detailed_content
+        }
+      })
+    }
+  },
+  { immediate: true }
+)
 
 let activeName = ref('ssq')
 
 const ssqStatisticsObject = computed(() => {
   let redTotal = 0
   let blueTotal = 0
-  const result = ssqKjxx.value.reduce(
+  const result = kjxx_shuangseqiu.value.reduce(
     (Statistics, element) => {
       const redBallArray = element.red.split(',')
       const blueBallArray = element.blue.split(',')
@@ -49,7 +68,7 @@ const ssqStatisticsObject = computed(() => {
 const cjdltStatisticsObject = computed(() => {
   let redTotal = 0
   let blueTotal = 0
-  const result = cjdltKjxx.value.reduce(
+  const result = kjxx_chaojidaletou.value.reduce(
     (Statistics, element) => {
       const redBallArray = element.lotteryDrawResult.split(' ').slice(0, 5)
       const blueBallArray = element.lotteryDrawResult.split(' ').slice(5)

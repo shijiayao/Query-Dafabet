@@ -6,8 +6,6 @@ const props = defineProps({
   HistoryObject: Object
 })
 
-const editGroupBallDialogVisible = ref(false)
-
 const addBallArray = ref({
   shuangseqiu: {
     redBallArray: ['', '', '', '', '', ''],
@@ -25,9 +23,6 @@ const addBallArray = ref({
     appendValue: true
   }
 })
-
-const groupballInfoChace = ref(null)
-const groupBallInfo = ref(null)
 
 const addBallObject = computed(() => {
   return addBallArray.value[props.HistoryObject.activeName]
@@ -77,13 +72,6 @@ function addGroupBall() {
   props.HistoryObject.addGroupBall(addBallObject.value)
 }
 
-function editGroupBall(row) {
-  editGroupBallDialogVisible.value = true
-
-  groupballInfoChace.value = JSON.parse(JSON.stringify(row))
-  groupBallInfo.value = row
-}
-
 function deleteGroupBall(row) {
   ElMessageBox.confirm(`要删除期号为【${row.期号}】的记录吗？`, `删除记录`, {
     confirmButtonText: '确认',
@@ -99,22 +87,6 @@ function deleteGroupBall(row) {
         message: '取消删除'
       })
     })
-}
-
-// 确认编辑按钮事件
-function confirmEditGroupBall() {
-  editGroupBallDialogVisible.value = false
-
-  // 检查数据是否变更，如果没有变更则不做任何操作，如有变更调用接口更新数据
-  if (JSON.stringify(groupballInfoChace.value) === JSON.stringify(groupBallInfo.value)) {
-    ElMessage({
-      type: 'info',
-      message: '数据没有更新'
-    })
-    return
-  }
-
-  props.HistoryObject.editGroupBall(groupBallInfo.value)
 }
 </script>
 
@@ -172,11 +144,15 @@ function confirmEditGroupBall() {
         </ul>
       </template>
     </el-table-column>
-    <el-table-column align="center" prop="号码" label="号码" width="240">
+    <el-table-column align="center" prop="投注号码" label="投注号码" width="240">
       <template #default="scope">
         <ul class="ball-gurp">
-          <li class="ball-item" :class="'ball-red' + isHitOrMiss(item, scope.row.开奖号码红球)" v-for="item in scope.row.号码红球" :key="item">{{ item }}</li>
-          <li class="ball-item" :class="'ball-blue' + isHitOrMiss(item, scope.row.开奖号码蓝球)" v-for="item in scope.row.号码蓝球" :key="item">{{ item }}</li>
+          <li class="ball-item" :class="'ball-red' + isHitOrMiss(item, scope.row.开奖号码红球)" v-for="item in scope.row.投注号码红球" :key="item">
+            {{ item }}
+          </li>
+          <li class="ball-item" :class="'ball-blue' + isHitOrMiss(item, scope.row.开奖号码蓝球)" v-for="item in scope.row.投注号码蓝球" :key="item">
+            {{ item }}
+          </li>
         </ul>
       </template>
     </el-table-column>
@@ -184,47 +160,10 @@ function confirmEditGroupBall() {
     <el-table-column align="center" prop="中奖金额" label="中奖金额"></el-table-column>
     <el-table-column align="center" label="操作" width="160">
       <template #default="scope">
-        <el-button type="primary" size="small" v-on:click="editGroupBall(scope.row)">编辑</el-button>
         <el-button type="danger" size="small" v-on:click="deleteGroupBall(scope.row)">删除</el-button>
       </template>
     </el-table-column>
   </el-table>
-
-  <el-dialog v-model="editGroupBallDialogVisible" align-center>
-    <section class="input-container">
-      <el-input
-        class="red-ball-input"
-        v-model="groupBallInfo.号码红球[index]"
-        style="width: 40px"
-        v-for="(item, index) in groupBallInfo.号码红球"
-        :key="index"
-      />
-      <el-tag type="info" size="large">+</el-tag>
-      <el-input
-        class="blue-ball-input"
-        v-model="groupBallInfo.号码蓝球[index]"
-        style="width: 40px"
-        v-for="(item, index) in groupBallInfo.号码蓝球"
-        :key="index"
-      />
-      <section class="param-group">
-        <el-input v-model="groupBallInfo.期号" style="width: 150px" disabled>
-          <template #prepend>期号</template>
-        </el-input>
-      </section>
-      <section class="param-group">
-        <el-input v-model="groupBallInfo.倍数" style="width: 130px">
-          <template #prepend>倍数</template>
-        </el-input>
-      </section>
-    </section>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="editGroupBallDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirmEditGroupBall">确认</el-button>
-      </div>
-    </template>
-  </el-dialog>
 </template>
 
 <style scoped lang="scss">

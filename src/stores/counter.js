@@ -11,24 +11,14 @@ export const useCounterStore = defineStore('counter', () => {
   return { count, doubleCount, increment }
 })
 
-function canshu(object) {
-  let resultArray = []
-
-  for (const key in object) {
-    resultArray.push(`${key}=${object[key]}`)
-  }
-
-  return resultArray.join('&')
-}
-
-export const useDafabetStore = defineStore('dafabetDatabase', () => {
+export const useDafabetStore = defineStore('DafabetStore', () => {
   // 初始化数据结构，确保有默认的数组格式
   const dafabetDatabase = ref({
     shuangseqiu: [],
     chaojidaletou: []
   })
 
-  function fetchData(params = {}) {
+  function increment(params = {}) {
     const defaultParams = {
       RequestType: 'query',
       ...params
@@ -59,59 +49,26 @@ export const useDafabetStore = defineStore('dafabetDatabase', () => {
   }
 
   // 初始化时调用
-  fetchData()
+  increment()
 
-  return { dafabetDatabase, fetchData }
+  return { dafabetDatabase, increment }
 })
 
-export const useShuangseqiuStore = defineStore('shuangseqiu', () => {
-  const kjxx = ref([])
+export const useCrawlerDrawStore = defineStore('CrawlerDrawStore', () => {
+  const crawlerDatabase = ref({
+    kjxx_shuangseqiu: [],
+    kjxx_chaojidaletou: []
+  })
+
   function increment() {
-    return fetch(
-      `/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice?${canshu({
-        name: 'ssq',
-        issueCount: '',
-        issueStart: '',
-        issueEnd: '',
-        dayStart: '',
-        dayEnd: '',
-        pageNo: 1,
-        pageSize: 100,
-        week: '',
-        systemType: 'PC'
-      })}`
-    )
+    fetch('/api/crawler/draw')
       .then((response) => response.json())
       .then((data) => {
-        kjxx.value = data.result
+        crawlerDatabase.value = data
       })
   }
 
   increment()
 
-  return { kjxx, increment }
-})
-
-export const useChaojidaletouStore = defineStore('chaojidaletou', () => {
-  const kjxx = ref([])
-  function increment() {
-    return fetch(
-      `/gateway/lottery/getHistoryPageListV1.qry?${canshu({
-        gameNo: 85,
-        provinceId: 0,
-        pageSize: 100,
-        isVerify: 1,
-        pageNo: 1,
-        termLimits: 100
-      })}`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        kjxx.value = data.value.list
-      })
-  }
-
-  increment()
-
-  return { kjxx, increment }
+  return { crawlerDatabase, increment }
 })

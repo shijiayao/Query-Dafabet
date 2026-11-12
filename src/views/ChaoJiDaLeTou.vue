@@ -1,14 +1,15 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useChaojidaletouStore } from '@/stores/counter'
+import { useCrawlerDrawStore } from '@/stores/counter'
 import { toChineseNumber } from '@/utils/utils.js'
 
-const store = useChaojidaletouStore()
+const crawlerDrawStore = useCrawlerDrawStore()
 
-const { kjxx } = storeToRefs(store)
+const { crawlerDatabase } = storeToRefs(crawlerDrawStore)
+let kjxx_chaojidaletou = ref([])
 const redBallArray = ref(['', '', '', '', '']) // 红球数组
-const blueBallArray = ref(['', '']) // 篮球数组
+const blueBallArray = ref(['', '']) // 蓝球数组
 let multiplying = ref(5) // 倍数
 let phase = ref('') // 期号
 let serial = ref(3) // 连续几期
@@ -29,15 +30,21 @@ const prizegradesArray = ref([
 ])
 
 function initValue() {
+  kjxx_chaojidaletou.value = crawlerDatabase.value.kjxx_chaojidaletou.map((elemment) => {
+    return {
+      id: elemment.id,
+      ...elemment.detailed_content
+    }
+  })
   redBallArray.value = ['', '', '', '', '']
   blueBallArray.value = ['', '']
 }
 
 watch(
-  kjxx,
-  (newValue) => {
-    if (!phase.value && newValue[0]) {
-      phase.value = newValue[0].lotteryDrawNum - 2
+  () => [crawlerDrawStore.crawlerDatabase],
+  ([crawlerDatabase]) => {
+    if (crawlerDatabase.kjxx_chaojidaletou.length > 0) {
+      phase.value = crawlerDatabase.kjxx_chaojidaletou[0].detailed_content.code - 2
 
       initValue()
     }
@@ -132,7 +139,7 @@ function computeMoney(row) {
     </section>
   </section>
 
-  <el-table :data="kjxx" stripe border style="width: 100%" class="cjdlt-el-table" :row-class-name="tableRowClassName_Phase">
+  <el-table :data="kjxx_chaojidaletou" stripe border style="width: 100%" class="cjdlt-el-table" :row-class-name="tableRowClassName_Phase">
     <el-table-column type="index" align="center" width="50" class-name="column-phase"></el-table-column>
     <el-table-column prop="lotteryDrawNum" label="期号" align="center" width="100" class-name="column-phase"></el-table-column>
     <el-table-column prop="lotteryDrawTime" label="开奖日期" align="center" width="140" class-name="column-phase"></el-table-column>
