@@ -256,7 +256,7 @@ function addGroupBall(params) {
   }
 
   dafabetStore
-    .fetchData({
+    .increment({
       RequestType: 'add',
       groupBall: addBallArray
     })
@@ -276,7 +276,7 @@ function addGroupBall(params) {
 
 function deleteGroupBall(params) {
   dafabetStore
-    .fetchData({
+    .increment({
       RequestType: 'delete',
       groupBall: [
         {

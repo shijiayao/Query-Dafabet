@@ -24,7 +24,7 @@ export const useDafabetStore = defineStore('DafabetStore', () => {
       ...params
     }
 
-    return fetch('/api/dafabet', {
+    return fetch('http://local.dafabet.com/api/dafabet', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -61,7 +61,7 @@ export const useCrawlerDrawStore = defineStore('CrawlerDrawStore', () => {
   })
 
   function increment() {
-    fetch('/api/crawler/draw')
+    fetch('http://local.dafabet.com/api/crawler/draw')
       .then((response) => response.json())
       .then((data) => {
         crawlerDatabase.value = data

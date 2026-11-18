@@ -16,8 +16,8 @@ export default defineConfig({
   server: {
     open: true, // 自动打开浏览器
     proxy: {
-      '/api/dafabet': 'http://local.dafabet.com',
-      '/api/crawler/draw': 'http://local.dafabet.com'
+      // '/api/dafabet': 'http://local.dafabet.com',
+      // '/api/crawler/draw': 'http://local.dafabet.com'
     }
   }
 })
